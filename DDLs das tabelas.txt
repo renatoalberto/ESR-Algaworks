@@ -1,0 +1,111 @@
+Criações de tabelas:
+
+CREATE TABLE `tab_cozinhas` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `nom_cozinha` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `estado` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `nome` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `cidade` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `nome` varchar(255) NOT NULL,
+  `estado_id` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKkworrwk40xj58kevvh3evi500` (`estado_id`),
+  CONSTRAINT `FKkworrwk40xj58kevvh3evi500` FOREIGN KEY (`estado_id`) REFERENCES `estado` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `restaurante` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `data_atualizacao` datetime(6) NOT NULL,
+  `data_cadastro` datetime(6) NOT NULL,
+  `endereco_bairro` varchar(255) DEFAULT NULL,
+  `endereco_cep` varchar(255) DEFAULT NULL,
+  `endereco_complemento` varchar(255) DEFAULT NULL,
+  `endereco_logradouro` varchar(255) DEFAULT NULL,
+  `endereco_numero` varchar(255) DEFAULT NULL,
+  `nome` varchar(255) NOT NULL,
+  `taxa_frete` decimal(19,2) NOT NULL,
+  `cozinha_id` bigint NOT NULL,
+  `endereco_cidade_id` bigint DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK1ypigtneik5hgnuo6824uq5y6` (`cozinha_id`),
+  KEY `FKbc0tm7hnvc96d8e7e2ulb05yw` (`endereco_cidade_id`),
+  CONSTRAINT `FK1ypigtneik5hgnuo6824uq5y6` FOREIGN KEY (`cozinha_id`) REFERENCES `tab_cozinhas` (`id`),
+  CONSTRAINT `FKbc0tm7hnvc96d8e7e2ulb05yw` FOREIGN KEY (`endereco_cidade_id`) REFERENCES `cidade` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `produto` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `ativo` bit(1) NOT NULL,
+  `descricao` varchar(255) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `preco` decimal(19,2) NOT NULL,
+  `restaurante_id` bigint NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKb9jhjyghjcn25guim7q4pt8qx` (`restaurante_id`),
+  CONSTRAINT `FKb9jhjyghjcn25guim7q4pt8qx` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurante` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `forma_pagamento` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `restaurante_formas_pagamento` (
+  `restaurante_id` bigint NOT NULL,
+  `forma_pagamento_id` bigint NOT NULL,
+  KEY `FKg99fjbqkawklm5w9hul267oot` (`forma_pagamento_id`),
+  KEY `FK7uj3ol5o5h1jpn780cxtl3tvb` (`restaurante_id`),
+  CONSTRAINT `FK7uj3ol5o5h1jpn780cxtl3tvb` FOREIGN KEY (`restaurante_id`) REFERENCES `restaurante` (`id`),
+  CONSTRAINT `FKg99fjbqkawklm5w9hul267oot` FOREIGN KEY (`forma_pagamento_id`) REFERENCES `forma_pagamento` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `permissao` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `descricao` varchar(255) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `grupo` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `nome` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `grupo_permissao` (
+  `grupo_id` bigint NOT NULL,
+  `permissao_id` bigint NOT NULL,
+  KEY `FKh21kiw0y0hxg6birmdf2ef6vy` (`permissao_id`),
+  KEY `FKta4si8vh3f4jo3bsslvkscc2m` (`grupo_id`),
+  CONSTRAINT `FKh21kiw0y0hxg6birmdf2ef6vy` FOREIGN KEY (`permissao_id`) REFERENCES `permissao` (`id`),
+  CONSTRAINT `FKta4si8vh3f4jo3bsslvkscc2m` FOREIGN KEY (`grupo_id`) REFERENCES `grupo` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `usuario` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `data_cadastro` datetime(6) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `nome` varchar(255) NOT NULL,
+  `senha` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `usuario_grupo` (
+  `usuario_id` bigint NOT NULL,
+  `grupo_id` bigint NOT NULL,
+  KEY `FKk30suuy31cq5u36m9am4om9ju` (`grupo_id`),
+  KEY `FKdofo9es0esuiahyw2q467crxw` (`usuario_id`),
+  CONSTRAINT `FKdofo9es0esuiahyw2q467crxw` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`),
+  CONSTRAINT `FKk30suuy31cq5u36m9am4om9ju` FOREIGN KEY (`grupo_id`) REFERENCES `grupo` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
