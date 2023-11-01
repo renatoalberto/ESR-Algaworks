@@ -6,6 +6,10 @@ import java.util.Optional;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -46,8 +50,14 @@ public class CozinhaController {
 	private CozinhaInputDisassembler cozinhaInputDisassembler;
 	
 	@GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<CozinhaDTO> listarJson() {
-		return cozinhaModelAssembler.toCollectionDTO(cozinhaRepository.findAll());
+	public Page<CozinhaDTO> listarJson(@PageableDefault(size = 2) Pageable pegeable) {
+		Page<Cozinha> cozinhaPage = cozinhaRepository.findAll(pegeable);
+		
+		List<CozinhaDTO> cozinhasDTO = cozinhaModelAssembler.toCollectionDTO(cozinhaPage.getContent());
+		
+		Page<CozinhaDTO> cozinhaDTOPage = new PageImpl<>(cozinhasDTO, pegeable, cozinhaPage.getSize()); 
+		
+		return cozinhaDTOPage;
 	}
 	
 	@GetMapping(produces = MediaType.APPLICATION_XML_VALUE)

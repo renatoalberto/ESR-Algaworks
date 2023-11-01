@@ -36,9 +36,14 @@ public class ProdutoCadastroService {
 		return produto;
 	}
 	
-	public List<Produto> buscarProdutosRestaurante(Long restauranteId) {
+	public List<Produto> buscarTodosProdutosRestaurante(Long restauranteId) {
 		Restaurante restaurante = restauranteCadastro.buscarOuFalhar(restauranteId);	
 		return produtoRepository.findByRestaurante(restaurante);
+	}
+	
+	public List<Produto> buscarProdutosAtivosRestaurante(Long restauranteId) {
+		Restaurante restaurante = restauranteCadastro.buscarOuFalhar(restauranteId);
+		return produtoRepository.findAtivosByRestaurante(restaurante);
 	}
 	
 	@Transactional

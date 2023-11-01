@@ -25,9 +25,8 @@ public class ModelMapperConfig {
 		
 		// Configuração de mapeamento para o nome do estado, dentro do EnderecoDTO
 		modelMapper.createTypeMap(Endereco.class, EnderecoDTO.class)
-		.<String>addMapping(
-				enderecoOrg -> enderecoOrg.getCidade().getEstado().getNome(),
-				(enderecoDst, value) -> enderecoDst.getCidade().setEstado(value));
+			.<String>addMapping(enderecoOrg -> enderecoOrg.getCidade().getEstado().getNome(),
+							   (enderecoDst, value) -> enderecoDst.getCidade().setEstado(value));
 		
 		// Configuração de mapeamento que não foi possível dar match
 		modelMapper.createTypeMap(Restaurante.class, RestauranteDTO.class)

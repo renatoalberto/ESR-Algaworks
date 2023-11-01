@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -35,6 +36,7 @@ import com.algaworks.algafood.api.assembler.RestauranteInputDisassembler;
 import com.algaworks.algafood.api.assembler.RestauranteModelAssembler;
 import com.algaworks.algafood.api.model.input.RestauranteInputDTO;
 import com.algaworks.algafood.api.model.output.RestauranteDTO;
+import com.algaworks.algafood.api.model.view.RestauranteView;
 import com.algaworks.algafood.core.validation.ValidacaoException;
 import com.algaworks.algafood.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.CozinhaNaoEncontradaExecption;
@@ -67,17 +69,41 @@ public class RestauranteController {
 	
 	@Autowired
 	private RestauranteInputDisassembler restauranteInputDisassembler;
-	
+
 	@GetMapping
-	public ResponseEntity<List<RestauranteDTO>> listar() {
-//		return ResponseEntity.ok(restauranteRepository.findAll());
+	public MappingJacksonValue listarProjecao(@RequestParam(required = false) String projecao) {
 		List<Restaurante> restaurantes = restauranteRepository.findAll();
+		List<RestauranteDTO> restauranteDTO = restauranteModelAssembler.toCollectionDTO (restaurantes);
 		
-//		System.out.println("Quero buscar informações da cozinha (LAZY LOAD), vai lá buscar agora...");
-//		System.out.println(restaurantes.get(0).getCozinha().getNome());
-				
-		return ResponseEntity.ok(restauranteModelAssembler.toCollectionDTO (restaurantes));		
+		MappingJacksonValue restauranteWrapper = new MappingJacksonValue(restauranteDTO);   // Fazendo projeção de recursos com @JsonView do Jackson
+		
+		restauranteWrapper.setSerializationView(RestauranteView.Resumo.class);              
+		
+		if ("apenas-nome".equals(projecao)) {
+			restauranteWrapper.setSerializationView(RestauranteView.ApenasNome.class);
+		} else if ("completo".equals(projecao)) {
+			restauranteWrapper.setSerializationView(null);
+		}
+		
+		return restauranteWrapper;
 	}
+	
+//	@GetMapping(params= "projecao=completo")
+//	public ResponseEntity<List<RestauranteDTO>> listarCompleto() {
+//		return listar();
+//	}
+//	
+//	@GetMapping(params= "projecao=resumo")
+//	@JsonView(RestauranteView.Resumo.class)        // Fazendo projeção de recursos com @JsonView do Jackson
+//	public ResponseEntity<List<RestauranteDTO>> listarResumido() {
+//		return listar();
+//	}
+//	
+//	@GetMapping(params= "projecao=apenas-nome")
+//	@JsonView(RestauranteView.ApenasNome.class)        // Fazendo projeção de recursos com @JsonView do Jackson
+//	public ResponseEntity<List<RestauranteDTO>> listarApenasNome() {
+//		return listar();
+//	}
 	
 	@GetMapping("/{id}")
 	public RestauranteDTO buscar(@PathVariable("id") Long restauranteId) {

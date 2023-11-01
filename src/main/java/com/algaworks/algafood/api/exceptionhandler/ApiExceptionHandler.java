@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -228,8 +229,16 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {       
 	    return handleValidationInternal(ex, ex.getBindResult(), request);
 	}     
 	
-	public ResponseEntity<Object> handleValidationInternal(Exception ex, BindingResult bindingResult, WebRequest request) {
+	@Override
+	public ResponseEntity<Object> handleBindException(BindException ex, HttpHeaders headers, HttpStatus status,
+			WebRequest request) {
 		System.out.println(12);
+		
+		return handleValidationInternal(ex, ex.getBindingResult(), request);
+	}
+	
+	private ResponseEntity<Object> handleValidationInternal(Exception ex, BindingResult bindingResult, WebRequest request) {
+		System.out.println(13);
 		
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		ProblemType problemType = ProblemType.DADOS_INVALIDOS;
@@ -238,7 +247,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {       
 		List<Problem.Object> problemObjects = bindingResult.getAllErrors().stream()
 				.map(objectError -> {
 					String message = messageSource.getMessage(objectError, LocaleContextHolder.getLocale());  // busca mensagens de validação globais em Resource Bundle - messages.properties			
-					
 					String name = objectError.getObjectName();
 					
 					if (objectError instanceof FieldError) {
@@ -262,7 +270,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {       
 	
 	@ExceptionHandler(NegocioExecption.class)
 	public ResponseEntity<?> handleNegocio(NegocioExecption ex, WebRequest request) {
-		System.out.println(13);
+		System.out.println(14);
 		
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 		ProblemType problemType = ProblemType.ERRO_NEGOCIO;
@@ -300,7 +308,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {       
 	@Override
 	protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
-		System.out.println(14);
+		System.out.println(15);
 		
 		if (body == null) {
 			System.out.println("14-1");
@@ -324,7 +332,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {       
 	}
 	
 	private Problem.ProblemBuilder createProblemBuilder(HttpStatus status, ProblemType problemType, String details) {
-		System.out.println(15);
+		System.out.println(16);
 		
 		return Problem.builder()
 				.status(status.value())
@@ -338,7 +346,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {       
 	
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<?> handleErroSistema(Exception ex, WebRequest request) {
-		System.out.println(16);
+		System.out.println(17);
 		
 		HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 		ProblemType problemType = ProblemType.ERRO_DE_SISTEMA;

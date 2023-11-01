@@ -15,7 +15,10 @@
 	<description>Treinamento ESR</description>
 	<properties>
 		<java.version>17</java.version>
-		<modelmapper.verion>3.1.0</modelmapper.verion>
+		<modelmapper.version>3.1.0</modelmapper.version>
+		<guava.version>31.1-jre</guava.version>
+		<jasperreports.version>6.20.6</jasperreports.version>
+		<jasperreports-functions.version>6.20.6</jasperreports-functions.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -88,8 +91,26 @@
 		<dependency>
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
-			<version>${modelmapper.verion}</version>
+			<version>${modelmapper.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>${guava.version}</version>
+		</dependency>
+		
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports</artifactId>
+		    <version>${jasperreports.version}</version>
+		</dependency>		
+		<dependency>
+		    <groupId>net.sf.jasperreports</groupId>
+		    <artifactId>jasperreports-functions</artifactId>
+		    <version>${jasperreports-functions.version}</version>
+		</dependency>
+		
+		
 	</dependencies>
 
 	<build>
