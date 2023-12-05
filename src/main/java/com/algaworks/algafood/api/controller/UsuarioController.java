@@ -6,6 +6,8 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +28,9 @@ import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.UsuarioRepository;
 import com.algaworks.algafood.domain.service.UsuarioCadastroService;
 
+//@CrossOrigin(origins = {"http://www.algafood.local:8000", "http://localhost:8000/"}) // Libera para alguns links 
+//@CrossOrigin(origins = "*")                                                          // Libera para todos os link 
+//@CrossOrigin(maxAge = 10)                                                            // Libera para todos os link e maxage para cache de 10 segundos  
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -43,9 +48,14 @@ public class UsuarioController {
 	private UsuarioInputDisassembler usuarioInputDisassembler;
 	
 	@GetMapping
-	public List<UsuarioDTO> listar() {
+	public ResponseEntity<List<UsuarioDTO>> listar() {
 		System.out.println("Entrou aqui");
-		return usuarioModelAssembler.toCollectionDTO(usuarioRepository.findAll());
+		List<UsuarioDTO> usuariosDTO =  usuarioModelAssembler.toCollectionDTO(usuarioRepository.findAll());
+		
+		return ResponseEntity.ok()                                                                   // ACCESS_CONTROL_ALLOW_ORIGIN para conhecimento, utilizar @CrossOrigin
+//				.header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://www.algafood.local:8000")   // Liberando uma página
+//				.header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "*")                                // Liberando todas as páginas
+				.body(usuariosDTO);
 	}
 	
 	@GetMapping("/{usuarioId}")

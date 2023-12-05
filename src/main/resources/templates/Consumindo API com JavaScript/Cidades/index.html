@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset=utf-8>
+  <style>
+    button {
+      color: #fff;
+      background-color: #007bff;
+      border: none;
+      font-size: 1rem;
+      padding: 10px;
+    }
+
+    #conteudo {
+      margin-top: 10px;
+      font-family: Arial;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <p>Levantar o servidor com o prompt na pasta desse documento: <pre>http-server -p 8000</pre></p>
+  <p>O preflight do CORS é uma chamada de verificação feita pelo navegador sempre que há uma requisição não considerada simples com o método OPTIONS</p>
+  <p>Uma descrição do que é considerado requisição simples pode ser encontrado no link <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests" target="_blank">Simple requests</a></p>
+  <br>
+  <br>
+  <h3>Listar Cidades</h3>  
+  <button id="botao" class="btn btn-primary">Fazer requisição - oi</button>
+  <div id="conteudo"></div>
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="cidades.js"></script>
+</body>
+</html>

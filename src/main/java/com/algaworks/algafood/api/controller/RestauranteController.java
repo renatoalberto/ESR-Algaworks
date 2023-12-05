@@ -73,7 +73,7 @@ public class RestauranteController {
 	@GetMapping
 	public MappingJacksonValue listarProjecao(@RequestParam(required = false) String projecao) {
 		List<Restaurante> restaurantes = restauranteRepository.findAll();
-		List<RestauranteDTO> restauranteDTO = restauranteModelAssembler.toCollectionDTO (restaurantes);
+		List<RestauranteDTO> restauranteDTO = restauranteModelAssembler.toCollectionDTO(restaurantes);
 		
 		MappingJacksonValue restauranteWrapper = new MappingJacksonValue(restauranteDTO);   // Fazendo projeção de recursos com @JsonView do Jackson
 		
