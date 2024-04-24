@@ -1,5 +1,6 @@
 package com.algaworks.algafood.api.controller;
 
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.filter.ShallowEtagHeaderFilter;
 
 import com.algaworks.algafood.api.assembler.FormaPagamentoInputDisassembler;
 import com.algaworks.algafood.api.assembler.FormaPagamentoModelAssembler;
@@ -44,17 +47,56 @@ public class FormaPagamentoController {
 	private FormaPagamentoInputDisassembler formaPagamentoInputDisassembler;
 	
 	@GetMapping
-	public ResponseEntity<Collection<FormaPagamentoDTO>> lista() {
+	public ResponseEntity<Collection<FormaPagamentoDTO>> lista(ServletWebRequest request) {
+		// 17.9. Implementando requisições condicionais com Deep ETags
+		ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());  // desabilitando o shallowEtagHeaderFilter para criar o Deep Eags
+		
+		String eTag = "0";
+		
+		OffsetDateTime dataUltimaAtualizacao = formaPagamentoRepository.getDataUltimaAtualizacao();
+		
+		if (dataUltimaAtualizacao != null) {
+			eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
+		}
+		
+		if (request.checkNotModified(eTag)) {
+			return null;
+		}
+		
 		Collection<FormaPagamentoDTO> formasPagamento = formaPagamentoModelAssembler.toCollectionDTO(formaPagamentoRepository.findAll());
 		
 		return ResponseEntity.ok()
 				.cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS))   // 17.2. Habilitando o cache com o cabeçalho Cache-Control e a diretiva max-age
+				.eTag(eTag)
 				.body(formasPagamento);
 	}
 	
 	@GetMapping("/{formaPagamentoId}")
-	public FormaPagamentoDTO buscar(@PathVariable Long formaPagamentoId) {		
-		return formaPagamentoModelAssembler.toFormaPagamentoDTO(formaPagamentoCadastroService.buscarOuFalhar(formaPagamentoId));
+	public ResponseEntity<FormaPagamentoDTO> buscar(ServletWebRequest request, @PathVariable Long formaPagamentoId) {
+		// 17.10. Desafio: implementando requisições condicionais com Deep ETags
+		ShallowEtagHeaderFilter.disableContentCaching(request.getRequest());  // desabilitando o shallowEtagHeaderFilter para criar o Deep Eags
+		
+		String eTag = "0";
+		
+		OffsetDateTime dataUltimaAtualizacao = formaPagamentoRepository.findDataUltimaAtualizacaoById(formaPagamentoId);
+		
+		if (dataUltimaAtualizacao != null) {
+			eTag = String.valueOf(dataUltimaAtualizacao.toEpochSecond());
+		}
+		
+		if (request.checkNotModified(eTag)) {
+			return null;
+		}
+		
+		FormaPagamentoDTO formaPagamento = formaPagamentoModelAssembler.toFormaPagamentoDTO(formaPagamentoCadastroService.buscarOuFalhar(formaPagamentoId));
+		
+		return ResponseEntity.ok()
+//				.cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS))                // 17.6. Adicionando outras diretivas de Cache-Control na resposta HTTP
+//				.cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS).cachePrivate()) // cachePrivate - para armazenamento apenas no cache local
+				.cacheControl(CacheControl.maxAge(10, TimeUnit.SECONDS).cachePublic())  // cachePublic  - padrão é public
+//  		    .cacheControl(CacheControl.noCache())                                   // noCache      - caso exista cache, sempre será solicitado validação no servidor
+//  			.cacheControl(CacheControl.noStore())                                   // noStore      - ninguém pode armazenar a rsposta em cache
+				.body(formaPagamento);
 	}
 	
 	@PostMapping

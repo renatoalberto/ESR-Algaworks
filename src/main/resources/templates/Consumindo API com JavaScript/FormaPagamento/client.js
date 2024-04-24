@@ -2,6 +2,7 @@ function consultar() {
   $.ajax({
     url: "http://api.algafood.local:8080/forma-pagamento",
     type: "get",
+//    headers: {'Cache-Control': 'no-cache'}, // Para impedir chache - 17.7. Usando a diretiva no-cache no cabeçalho Cache-Control da requisição
 
     success: function(response) {
       preencherTabela(response);
@@ -46,21 +47,51 @@ function preencherTabela(formasPagamento) {
   $.each(formasPagamento, function(i, formaPagamento) {
     var linha = $("<tr>");
     
-    var linkAcao = $("<a href='#'>")
+    var linkAcaoExcluir = $("<a href='#' style='color:red;' >")
       .text("Excluir")
       .click(function(event) {
         event.preventDefault();
         excluir(formaPagamento);
       });
+      
+        
+    var linkAcaoConsultar = $("<a href='#'>")
+      .text("Consultar")
+      .click(function(event) {
+        event.preventDefault();
+        buscar(formaPagamento);
+      });
+      
+    var textPip = " | ";
 
     linha.append(
       $("<td>").text(formaPagamento.id),
       $("<td>").text(formaPagamento.descricao),
-      $("<td>").append(linkAcao)      
+      $("<td>").append(linkAcaoConsultar).append(textPip).append(linkAcaoExcluir)    
     );
 
     linha.appendTo("#tabela");
   });
+}
+
+function buscar(formaPagamento) {
+  $.ajax({
+    url: "http://api.algafood.local:8080/forma-pagamento/" + formaPagamento.id,
+    type: "get",
+
+    success: function(response) {
+		alert("Forma de pagamento: (" + formaPagamento.id + ") " + formaPagamento.descricao);		
+    },
+    
+	error: function(error) {
+      // tratando todos os erros da categoria 4xx
+      if (error.status >= 400 && error.status <= 499) {
+        var problem = JSON.parse(error.responseText);
+          alert(problem.userMessager);
+      } else {
+          alert("Erro ao remover forma de pagamento");
+      }}    
+  });	
 }
 
 function excluir(formaPagamento) {
